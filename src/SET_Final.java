@@ -1,7 +1,10 @@
 import processing.core.PApplet;
 import processing.core.PFont;
+import processing.core.PImage;
 
 public class SET_Final extends PApplet {
+	static PImage cimg;
+
 	// for extracting pieces of image at
 	// http://clojure.paris/resources/public/imgs/all-cards.png
 	public static final int SHEET_LENGTH = 9; // # of cards in a row (or column) on the sheet
@@ -45,13 +48,52 @@ public class SET_Final extends PApplet {
 	public static int score;
 	public static int SCORE_LEFT_OFFSET = GRID_LEFT_OFFSET;
 	public static int SCORE_TOP_OFFSET = 25;
+
+	// timer
+	public static int gameTimer = 0;
+	public static int setTimer = 0;
+	public static int runningTimerStart;
+	public static int timeElapsed = 0;
+
 	// timer info
 	public static PFont timerFont;
-
 	public static int runningTimer;
 	public static int runningTimerEnd;
 	public static final int TIMER_LEFT_OFFSET = SCORE_LEFT_OFFSET + 256;
 	public static final int TIMER_TOP_OFFSET = SCORE_TOP_OFFSET;
+
+	// msg info
+	public static PFont messageFont;
+	public final int MESSAGE_FILL = color(0, 0, 0);
+	public static int message;
+	public static final int MESSAGE_LEFT_OFFSET = TIMER_LEFT_OFFSET + 256;
+	public static final int MESSAGE_TOP_OFFSET = TIMER_TOP_OFFSET;
+
+	// directions info
+	public static PFont keyOptionsFont;
+	public final int KEY_OPTIONS_FILL = color(0, 0, 0);
+	public static final int KEY_OPTIONS_LEFT_OFFSET = GRID_LEFT_OFFSET;
+	public static final int KEY_OPTIONS_TOP_OFFSET = BUTTON_TOP_OFFSET + BUTTON_HEIGHT + 48;
+	public static final String keyOptions = "q, w, e, r, [t, y, u]: top row;\na, s, d, f, [g, h, j]: second row;\n"
+			+ "z, x, c, v, [b, n, m]: third row\n"
+			+ "+ to add cards, - to find a set, SPACE to pause, ENTER/RETURN for a new game";
+
+	public final int BACKGROUND_COLOR = color(189, 195, 199);
+	public static final int HIGHLIGHT_TICKS = 35;
+	public static final int FIND_SET_TICKS = 60;
+	public static int highlightCounter = 0;
+
+	// state:
+	// 0 --> normal play
+	// 1 --> 3 cards selected (for freezing highlights)
+	// 2 --> find sset selected
+	// 3 --> gg
+	// 4 --> paused
+	public static enum State {
+		PLAYING, EVAL_SET, FIND_SET, GAME_OVER, PAUSED
+	};
+
+	public static State state = State.PLAYING;
 
 	public static void main(String[] args) {
 		PApplet.main("SET_Final");
