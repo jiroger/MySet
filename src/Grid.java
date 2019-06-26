@@ -26,6 +26,62 @@ public class Grid {
 		FOUND_HIGHLIGHT = parent.color(17, 204, 204);
 	}
 
+	// GRID MUTATIONS
+
+	// highlights or remove highlight
+	// changes # of cards selected
+	public void updateSelected(int col, int row) {
+		Card card = board[col][row];
+
+		if (selectedCards.contains(card)) {
+			int index = selectedCards.indexOf(card);
+			selectedLocs.remove(index);
+			selectedCards.remove(card);
+			// score--;
+		} else {
+			selectedLocs.add(new Location(col, row));
+			selectedCards.add(card);
+		}
+
+		// System.out.println("Cards = " + selectedCards + ", Locations = " +
+		// selectedLocs);
+	}
+
+	public void removeSet() {
+		// note to self: cards should not change locations unless
+		// # of cols goes down for better ux. if # cols go down, cards from rightmost
+		// col moves to fill in the cards removed from selected set
+
+		selectedLocs.sort(null); // orders the selected locations
+
+		if (cardsInPlay > 12 || SET_Final.deck.size() == 0) {
+			for (int i = 0; i < 3; i++) {
+				int removedCardCol = selectedLocs.get(i).getCol(); // the column of the card in the grid we want to
+																	// remove
+				int removedCardRow = selectedLocs.get(i).getRow(); // the row of the card in the grid we want to remove
+				int lastCard = cardsInPlay - 1; // basically both the row and column function take in a number n to
+												// determine
+				// the card's location. the number n is what u get if u were to squash the 2d
+				// array into a 1d array. right now
+				// the value lastcard has bascailly means that its looking at the last card on
+				// the table
+				board[removedCardCol][removedCardRow] = board[col(lastCard)][row(lastCard)]; // we replace one of the
+																								// cards we want
+				// to remove with a card from the far right.
+
+				cardsInPlay--; // we just removed a card from play, so one less card
+			}
+			SET_Final.currentCols--; // we are collapsing the # of cols cuz we just removed one
+		} else if (cardsInPlay == 12 && SET_Final.deck.size() > 0) {
+			for (int i = 0; i < 3; i++) {
+				int removedCardCol = selectedLocs.get(i).getCol(); // the column of the card we want to remove
+				int removedCardRow = selectedLocs.get(i).getRow(); // the row of the card we want to remove
+				board[removedCardCol][removedCardRow] = SET_Final.deck.deal();
+				// no need for currentCols-- because the minimum # of cards is 12
+			}
+		}
+	}
+
 	// DISPLAY CODE
 
 	public void display() {
@@ -110,6 +166,19 @@ public class Grid {
 	public void clearSelected() {
 		// TODO Auto-generated method stub
 
+	}
+	// UTILITY FUNCTIONS FOR GRID CLASS
+
+	public int col(int n) {
+		return n / 3;
+	}
+
+	public int row(int n) {
+		return n % 3;
+	}
+
+	public int rightOffset() {
+		return SET_Final.GRID_LEFT_OFFSET + SET_Final.currentCols * (SET_Final.CARD_WIDTH + SET_Final.GRID_X_SPACER);
 	}
 
 }
