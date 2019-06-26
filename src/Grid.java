@@ -39,8 +39,57 @@ public class Grid {
 	}
 
 	public void highlightSelectedCards() {
-		// TODO Auto-generated method stub
+		int highlight;
+		if (SET_Final.state == SET_Final.State.FIND_SET) {
+			highlight = FOUND_HIGHLIGHT;
+			selectedLocs = findSet();
+			if (selectedLocs.size() == 0) {
+				SET_Final.message = 6;
+				return;
+			}
+		} else if (selectedLocs.size() < 3) {
+			highlight = SELECTED_HIGHLIGHT;
+		} else {
+			highlight = Set_Game_Logic.isSet(selectedCards.get(0), selectedCards.get(1), selectedCards.get(2))
+					? CORRECT_HIGHLIGHT
+					: INCORRECT_HIGHLIGHT;
+		}
+		for (Location loc : selectedLocs) {
+			drawHighlight(loc, highlight);
+		}
+	}
 
+	public void drawHighlight(Location loc, int highlightColor) {
+		parent.stroke(highlightColor);
+		parent.strokeWeight(5);
+		parent.noFill();
+		int col = loc.getCol();
+		int row = loc.getRow();
+		parent.rect(SET_Final.GRID_LEFT_OFFSET + col * (SET_Final.CARD_WIDTH + SET_Final.GRID_X_SPACER),
+				SET_Final.GRID_TOP_OFFSET + row * (SET_Final.CARD_HEIGHT + SET_Final.GRID_Y_SPACER),
+				SET_Final.CARD_WIDTH, SET_Final.CARD_HEIGHT);
+		parent.stroke(parent.color(0, 0, 0));
+		parent.strokeWeight(1);
+	}
+
+	// if there is a set on the board, existsSet() returns ArrayList containing
+	// the locations of three cards that form a set, an empty ArrayList (not null)
+	// otherwise
+	public ArrayList<Location> findSet() {
+		ArrayList<Location> locs = new ArrayList<Location>();
+		for (int i = 0; i < SET_Final.currentCols * 3 - 2; i++) {
+			for (int j = i + 1; j < SET_Final.currentCols * 3 - 1; j++) {
+				for (int k = j + 1; k < SET_Final.currentCols * 3; k++) {
+					if (Set_Game_Logic.isSet(board[col(i)][row(i)], board[col(j)][row(j)], board[col(k)][row(k)])) {
+						locs.add(new Location(col(i), row(i)));
+						locs.add(new Location(col(j), row(j)));
+						locs.add(new Location(col(k), row(k)));
+						return locs;
+					}
+				}
+			}
+		}
+		return new ArrayList<Location>();
 	}
 
 	public boolean tripleSelected() {
