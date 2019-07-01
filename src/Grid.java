@@ -148,24 +148,45 @@ public class Grid {
 		return new ArrayList<Location>();
 	}
 
+	public boolean isGameOver() {
+		return findSet().size() == 0 && SET_Final.deck.size() == 0;
+	}
+
 	public boolean tripleSelected() {
-		// TODO Auto-generated method stub
-		return false;
+		return (selectedLocs.size() == 3);
 	}
 
-	public void processTriple() {
-		// TODO Auto-generated method stub
-
+	public void addCardToBoard(Card card) {
+		board[col(cardsInPlay)][row(cardsInPlay)] = card; // we use the col function below (which determines which
+															// column we are on)
+		// and the row fx below (to determine which row we are on) to find right place
+		// to insert card.
+		// key thing to note is that these coordinates represent the last card in the
+		// table.
+		cardsInPlay++; // increment cuz we just added a card to board
 	}
 
-	public void addCardToBoard(Object deal) {
-		// TODO Auto-generated method stub
-
+	public void addColumn() {
+		if (SET_Final.deck.size() == 0) {
+			SET_Final.message = 5; // sets message to no more cards
+			return; // breaks out of the function
+		}
+		if (findSet().size() == 0) { // if no sets were found
+			SET_Final.score += 5; // yay u gain points for finding that out
+			addCardToBoard(SET_Final.deck.deal()); // add 3 more cards
+			addCardToBoard(SET_Final.deck.deal());
+			addCardToBoard(SET_Final.deck.deal());
+			SET_Final.currentCols++; // cuz we added more cards one more column
+			SET_Final.message = 3;
+		} else {
+			SET_Final.score -= 5; // u idiot there was a set, u lose points
+			SET_Final.message = 4;
+		}
 	}
 
 	public void clearSelected() {
-		// TODO Auto-generated method stub
-
+		selectedLocs.clear();
+		selectedCards.clear();
 	}
 	// UTILITY FUNCTIONS FOR GRID CLASS
 
