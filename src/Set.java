@@ -2,7 +2,7 @@ import processing.core.PApplet;
 import processing.core.PFont;
 import processing.core.PImage;
 
-public class SET_Final extends PApplet {
+public class Set extends PApplet {
 	static PImage cimg;
 
 	// for extracting pieces of image at
@@ -134,14 +134,14 @@ public class SET_Final extends PApplet {
 			highlightCounter = 0;
 		}
 
-		// Three cards selected; process them
+		// 3 cards selected; process them
 		if (state == State.EVAL_SET) {
 			if (highlightCounter == HIGHLIGHT_TICKS) { // 35 ticks showing special highlight
 				grid.processTriple();
 			} else {
 				highlightCounter = highlightCounter + 1;
 			}
-			// Find Set selected
+			// find set clicked
 		} else if (state == State.FIND_SET) {
 			if (highlightCounter == FIND_SET_TICKS) { // 35 ticks showing special highlight
 				state = State.PLAYING;
@@ -154,13 +154,13 @@ public class SET_Final extends PApplet {
 	}
 
 	public void drawButtons() {
-		// Start, Stop, Clear rectangles in gray
+		// start, stop, clear rectangles in gray
 		fill(color(221, 221, 221));
 		for (int i = 0; i < NUM_BUTTONS; i++) {
 			rect(BUTTON_LEFT_OFFSET + i * (BUTTON_WIDTH + 12), BUTTON_TOP_OFFSET, BUTTON_WIDTH, BUTTON_HEIGHT);
 		}
 
-		// Set text color on the buttons to blue
+		// set text color on the buttons to blue
 		fill(color(0, 0, 255));
 
 		text("Add Cards", BUTTON_LEFT_OFFSET + 18, BUTTON_TOP_OFFSET + 22);
@@ -260,6 +260,67 @@ public class SET_Final extends PApplet {
 			str = "Something is wrong. :-(";
 		}
 		text(str, MESSAGE_LEFT_OFFSET, MESSAGE_TOP_OFFSET);
+	}
+
+	// A BUNCH OF RANDOM HELPER FUNCTIONS FOR CLICKING AND KEY PRESSES AND STUFFS
+	@Override
+	public void keyPressed() {
+		if (key == ENTER || key == RETURN) {
+			newGame();
+			return;
+		}
+
+		if (state == State.GAME_OVER)
+			return;
+
+		if (key == ' ') {
+			Timer_Procedures.togglePauseResume(this);
+			return;
+		}
+
+		// no fair playing with timer paused
+		if (state != State.PLAYING)
+			return;
+
+		String legal = "QWERTYUASDFGHJZXCVVBNMqwertyuasdfghjzxcvbnm+=-_Pp ";
+		if (legal.indexOf(key) < 0) {
+			message = 8;
+			return;
+		}
+
+		if ("+=-_ ".indexOf(key) >= 0) {
+			switch (key) {
+			case ' ':
+				Timer_Procedures.togglePauseResume(this);
+				break;
+			case '=':
+			case '+':
+				grid.addColumn();
+				break;
+			case '_':
+			case '-':
+				state = State.FIND_SET;
+				highlightCounter = 0;
+				break;
+			default:
+				break;
+			}
+			return;
+		}
+
+		int col = "qazQAZ".indexOf(key) >= 0 ? 0
+				: "wsxWSX".indexOf(key) >= 0 ? 1
+						: "edcEDC".indexOf(key) >= 0 ? 2
+								: "rfvRFV".indexOf(key) >= 0 ? 3
+										: "tgbTGB".indexOf(key) >= 0 ? 4
+												: "yhnYHN".indexOf(key) >= 0 ? 5 : "ujmUJM".indexOf(key) >= 0 ? 6 : 7;
+		int row = "qwertyuQWERTYU".indexOf(key) >= 0 ? 0 : "asdfghjASDFGHJ".indexOf(key) >= 0 ? 1 : 2;
+
+		if (col < currentCols) {
+			grid.updateSelected(col, row);
+		} else {
+			message = 8;
+		}
 	}
 
 }

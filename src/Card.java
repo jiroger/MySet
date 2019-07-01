@@ -29,20 +29,20 @@ public class Card {
 	}
 
 	public void display(int boardCol, int boardRow) {
-		if (SET_Final.state == SET_Final.State.PAUSED) {
+		if (Set.state == Set.State.PAUSED) {
 			parent.fill(parent.color(255, 136, 0));
-			parent.rect(SET_Final.GRID_LEFT_OFFSET + boardCol * (SET_Final.CARD_WIDTH + SET_Final.GRID_X_SPACER),
-					SET_Final.GRID_TOP_OFFSET + boardRow * (SET_Final.CARD_HEIGHT + SET_Final.GRID_Y_SPACER),
-					SET_Final.CARD_WIDTH, SET_Final.CARD_HEIGHT);
+			parent.rect(Set.GRID_LEFT_OFFSET + boardCol * (Set.CARD_WIDTH + Set.GRID_X_SPACER),
+					Set.GRID_TOP_OFFSET + boardRow * (Set.CARD_HEIGHT + Set.GRID_Y_SPACER),
+					Set.CARD_WIDTH, Set.CARD_HEIGHT);
 		} else {
-			parent.image(SET_Final.cimg,
-					SET_Final.GRID_LEFT_OFFSET + boardCol * (SET_Final.CARD_WIDTH + SET_Final.GRID_X_SPACER),
-					SET_Final.GRID_TOP_OFFSET + boardRow * (SET_Final.CARD_HEIGHT + SET_Final.GRID_Y_SPACER),
-					SET_Final.CARD_WIDTH, SET_Final.CARD_HEIGHT,
-					SET_Final.SHEET_LEFT_OFFSET + col * SET_Final.CARD_WIDTH,
-					SET_Final.SHEET_TOP_OFFSET + row * SET_Final.CARD_HEIGHT,
-					(col + 1) * SET_Final.CARD_WIDTH + SET_Final.CARD_X_SPACER,
-					(row + 1) * SET_Final.CARD_HEIGHT + SET_Final.CARD_Y_SPACER);
+			parent.image(Set.cimg,
+					Set.GRID_LEFT_OFFSET + boardCol * (Set.CARD_WIDTH + Set.GRID_X_SPACER),
+					Set.GRID_TOP_OFFSET + boardRow * (Set.CARD_HEIGHT + Set.GRID_Y_SPACER),
+					Set.CARD_WIDTH, Set.CARD_HEIGHT,
+					Set.SHEET_LEFT_OFFSET + col * Set.CARD_WIDTH,
+					Set.SHEET_TOP_OFFSET + row * Set.CARD_HEIGHT,
+					(col + 1) * Set.CARD_WIDTH + Set.CARD_X_SPACER,
+					(row + 1) * Set.CARD_HEIGHT + Set.CARD_Y_SPACER);
 		}
 	}
 

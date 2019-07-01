@@ -12,8 +12,8 @@ public class Deck {
 	}
 
 	public void initDeck() {
-		for (int col = 0; col < SET_Final.SHEET_LENGTH; col++) {
-			for (int row = 0; row < SET_Final.SHEET_LENGTH; row++) {
+		for (int col = 0; col < Set.SHEET_LENGTH; col++) {
+			for (int row = 0; row < Set.SHEET_LENGTH; row++) {
 				cards.add(new Card(col, row, parent));
 			}
 		}

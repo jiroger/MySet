@@ -10,7 +10,7 @@ public class Grid {
 	public final int FOUND_HIGHLIGHT;
 	// In the physical SET game, cards are placed on the table.
 	// The table contains the grid of cards and is typically called the board.
-	Card[][] board = new Card[SET_Final.MAX_COLS][SET_Final.ROWS]; // Array that contains cards
+	Card[][] board = new Card[Set.MAX_COLS][Set.ROWS]; // Array that contains cards
 
 	ArrayList<Location> selectedLocs = new ArrayList<Location>(); // Locations selected by the player
 	ArrayList<Card> selectedCards = new ArrayList<Card>(); // Cards selected by the player
@@ -54,7 +54,7 @@ public class Grid {
 
 		selectedLocs.sort(null); // orders the selected locations
 
-		if (cardsInPlay > 12 || SET_Final.deck.size() == 0) {
+		if (cardsInPlay > 12 || Set.deck.size() == 0) {
 			for (int i = 0; i < 3; i++) {
 				int removedCardCol = selectedLocs.get(i).getCol(); // the column of the card in the grid we want to
 																	// remove
@@ -71,15 +71,36 @@ public class Grid {
 
 				cardsInPlay--; // we just removed a card from play, so one less card
 			}
-			SET_Final.currentCols--; // we are collapsing the # of cols cuz we just removed one
-		} else if (cardsInPlay == 12 && SET_Final.deck.size() > 0) {
+			Set.currentCols--; // we are collapsing the # of cols cuz we just removed one
+		} else if (cardsInPlay == 12 && Set.deck.size() > 0) {
 			for (int i = 0; i < 3; i++) {
 				int removedCardCol = selectedLocs.get(i).getCol(); // the column of the card we want to remove
 				int removedCardRow = selectedLocs.get(i).getRow(); // the row of the card we want to remove
-				board[removedCardCol][removedCardRow] = SET_Final.deck.deal();
+				board[removedCardCol][removedCardRow] = Set.deck.deal();
 				// no need for currentCols-- because the minimum # of cards is 12
 			}
 		}
+	}
+
+	public void processTriple() {
+		if (Set_Game_Logic.isSet(selectedCards.get(0), selectedCards.get(1), selectedCards.get(2))) {
+			Set.score += 10;
+			removeSet();
+			if (isGameOver()) {
+				Set.state = Set.State.GAME_OVER;
+				Set.runningTimerEnd = parent.millis(); // end the timer
+				Set.score += Timer_Procedures.timerScore();
+				Set.message = 7;
+			} else {
+				Set.state = Set.State.PLAYING;
+				Set.message = 1;
+			}
+		} else {
+			Set.score -= 5;
+			Set.state = Set.State.PLAYING;
+			Set.message = 2;
+		}
+		clearSelected();
 	}
 
 	// DISPLAY CODE
@@ -88,7 +109,7 @@ public class Grid {
 
 		int cols = cardsInPlay / 3;
 		for (int col = 0; col < cols; col++) {
-			for (int row = 0; row < SET_Final.ROWS; row++) {
+			for (int row = 0; row < Set.ROWS; row++) {
 				board[col][row].display(col, row);
 			}
 		}
@@ -96,11 +117,11 @@ public class Grid {
 
 	public void highlightSelectedCards() {
 		int highlight;
-		if (SET_Final.state == SET_Final.State.FIND_SET) {
+		if (Set.state == Set.State.FIND_SET) {
 			highlight = FOUND_HIGHLIGHT;
 			selectedLocs = findSet();
 			if (selectedLocs.size() == 0) {
-				SET_Final.message = 6;
+				Set.message = 6;
 				return;
 			}
 		} else if (selectedLocs.size() < 3) {
@@ -121,9 +142,9 @@ public class Grid {
 		parent.noFill();
 		int col = loc.getCol();
 		int row = loc.getRow();
-		parent.rect(SET_Final.GRID_LEFT_OFFSET + col * (SET_Final.CARD_WIDTH + SET_Final.GRID_X_SPACER),
-				SET_Final.GRID_TOP_OFFSET + row * (SET_Final.CARD_HEIGHT + SET_Final.GRID_Y_SPACER),
-				SET_Final.CARD_WIDTH, SET_Final.CARD_HEIGHT);
+		parent.rect(Set.GRID_LEFT_OFFSET + col * (Set.CARD_WIDTH + Set.GRID_X_SPACER),
+				Set.GRID_TOP_OFFSET + row * (Set.CARD_HEIGHT + Set.GRID_Y_SPACER),
+				Set.CARD_WIDTH, Set.CARD_HEIGHT);
 		parent.stroke(parent.color(0, 0, 0));
 		parent.strokeWeight(1);
 	}
@@ -133,9 +154,9 @@ public class Grid {
 	// otherwise
 	public ArrayList<Location> findSet() {
 		ArrayList<Location> locs = new ArrayList<Location>();
-		for (int i = 0; i < SET_Final.currentCols * 3 - 2; i++) {
-			for (int j = i + 1; j < SET_Final.currentCols * 3 - 1; j++) {
-				for (int k = j + 1; k < SET_Final.currentCols * 3; k++) {
+		for (int i = 0; i < Set.currentCols * 3 - 2; i++) {
+			for (int j = i + 1; j < Set.currentCols * 3 - 1; j++) {
+				for (int k = j + 1; k < Set.currentCols * 3; k++) {
 					if (Set_Game_Logic.isSet(board[col(i)][row(i)], board[col(j)][row(j)], board[col(k)][row(k)])) {
 						locs.add(new Location(col(i), row(i)));
 						locs.add(new Location(col(j), row(j)));
@@ -148,14 +169,7 @@ public class Grid {
 		return new ArrayList<Location>();
 	}
 
-	public boolean isGameOver() {
-		return findSet().size() == 0 && SET_Final.deck.size() == 0;
-	}
-
-	public boolean tripleSelected() {
-		return (selectedLocs.size() == 3);
-	}
-
+	// dealing cards stuff
 	public void addCardToBoard(Card card) {
 		board[col(cardsInPlay)][row(cardsInPlay)] = card; // we use the col function below (which determines which
 															// column we are on)
@@ -167,26 +181,36 @@ public class Grid {
 	}
 
 	public void addColumn() {
-		if (SET_Final.deck.size() == 0) {
-			SET_Final.message = 5; // sets message to no more cards
+		if (Set.deck.size() == 0) {
+			Set.message = 5; // sets message to no more cards
 			return; // breaks out of the function
 		}
 		if (findSet().size() == 0) { // if no sets were found
-			SET_Final.score += 5; // yay u gain points for finding that out
-			addCardToBoard(SET_Final.deck.deal()); // add 3 more cards
-			addCardToBoard(SET_Final.deck.deal());
-			addCardToBoard(SET_Final.deck.deal());
-			SET_Final.currentCols++; // cuz we added more cards one more column
-			SET_Final.message = 3;
+			Set.score += 5; // yay u gain points for finding that out
+			addCardToBoard(Set.deck.deal()); // add 3 more cards
+			addCardToBoard(Set.deck.deal());
+			addCardToBoard(Set.deck.deal());
+			Set.currentCols++; // cuz we added more cards one more column
+			Set.message = 3;
 		} else {
-			SET_Final.score -= 5; // u idiot there was a set, u lose points
-			SET_Final.message = 4;
+			Set.score -= 5; // u idiot there was a set, u lose points
+			Set.message = 4;
 		}
 	}
+
+	// game logistics functions
 
 	public void clearSelected() {
 		selectedLocs.clear();
 		selectedCards.clear();
+	}
+
+	public boolean isGameOver() {
+		return findSet().size() == 0 && Set.deck.size() == 0;
+	}
+
+	public boolean tripleSelected() {
+		return (selectedLocs.size() == 3);
 	}
 	// UTILITY FUNCTIONS FOR GRID CLASS
 
@@ -199,7 +223,7 @@ public class Grid {
 	}
 
 	public int rightOffset() {
-		return SET_Final.GRID_LEFT_OFFSET + SET_Final.currentCols * (SET_Final.CARD_WIDTH + SET_Final.GRID_X_SPACER);
+		return Set.GRID_LEFT_OFFSET + Set.currentCols * (Set.CARD_WIDTH + Set.GRID_X_SPACER);
 	}
 
 }

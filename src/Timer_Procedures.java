@@ -6,7 +6,7 @@ public class Timer_Procedures {
 
 	public static void togglePauseResume(PApplet p) {
 		parent = p;
-		if (SET_Final.state == SET_Final.State.PAUSED) {
+		if (Set.state == Set.State.PAUSED) {
 			resumeGame(parent);
 		} else {
 			pauseGame(parent);
@@ -14,35 +14,35 @@ public class Timer_Procedures {
 	}
 
 	public static void pauseGame(PApplet theParent) {
-		SET_Final.state = SET_Final.State.PAUSED;
-		SET_Final.timeElapsed += theParent.millis() - SET_Final.runningTimerStart;
-		SET_Final.message = 9;
+		Set.state = Set.State.PAUSED;
+		Set.timeElapsed += theParent.millis() - Set.runningTimerStart;
+		Set.message = 9;
 	}
 
 	public static void resumeGame(PApplet theParent) {
-		SET_Final.state = SET_Final.State.PLAYING;
-		SET_Final.runningTimerStart = theParent.millis();
-		SET_Final.message = 10;
+		Set.state = Set.State.PLAYING;
+		Set.runningTimerStart = theParent.millis();
+		Set.message = 10;
 	}
 
 	static void showTimer(PApplet p) {
 		parent = p;
 		TIMER_FILL = parent.color(0, 0, 0);
-		parent.textFont(SET_Final.timerFont);
+		parent.textFont(Set.timerFont);
 		parent.fill(TIMER_FILL);
 		// If the game is paused, show time elapsed
 		// If the game is over, show time to complete
 		// Otherwise, show time elapsed so far in current game
-		if (SET_Final.state == SET_Final.State.PAUSED) {
-			parent.text("Time: " + SET_Final.timeElapsed / 1000, SET_Final.TIMER_LEFT_OFFSET,
-					SET_Final.TIMER_TOP_OFFSET);
-		} else if (SET_Final.state == SET_Final.State.GAME_OVER) {
+		if (Set.state == Set.State.PAUSED) {
+			parent.text("Time: " + Set.timeElapsed / 1000, Set.TIMER_LEFT_OFFSET,
+					Set.TIMER_TOP_OFFSET);
+		} else if (Set.state == Set.State.GAME_OVER) {
 			parent.text(
-					"Time: " + (SET_Final.runningTimerEnd - SET_Final.runningTimerStart + SET_Final.timeElapsed) / 1000,
-					SET_Final.TIMER_LEFT_OFFSET, SET_Final.TIMER_TOP_OFFSET);
+					"Time: " + (Set.runningTimerEnd - Set.runningTimerStart + Set.timeElapsed) / 1000,
+					Set.TIMER_LEFT_OFFSET, Set.TIMER_TOP_OFFSET);
 		} else {
-			parent.text("Time: " + (parent.millis() - SET_Final.runningTimerStart + SET_Final.timeElapsed) / 1000,
-					SET_Final.TIMER_LEFT_OFFSET, SET_Final.TIMER_TOP_OFFSET);
+			parent.text("Time: " + (parent.millis() - Set.runningTimerStart + Set.timeElapsed) / 1000,
+					Set.TIMER_LEFT_OFFSET, Set.TIMER_TOP_OFFSET);
 		}
 	}
 
@@ -54,7 +54,7 @@ public class Timer_Procedures {
 		//
 		// If it took 277 seconds to finish the game, this should return 23 (300-277=23)
 		// If it took 435 seconds to finish the game, this should return 0 (435 > 300)
-		int secs = Math.round(SET_Final.timeElapsed / 1000); // time elapsed is in milliseconds; divide by 1000 to get
+		int secs = Math.round(Set.timeElapsed / 1000); // time elapsed is in milliseconds; divide by 1000 to get
 																// seconds
 		return Math.max(300 - secs, 0); // if less than 300 secs, u get extra. if not, u dont get anything
 	}
