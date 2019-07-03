@@ -96,7 +96,7 @@ public class Set extends PApplet {
 	public static State state = State.PLAYING;
 
 	public static void main(String[] args) {
-		PApplet.main("SET_Final");
+		PApplet.main("Set");
 	}
 
 	@Override
@@ -320,6 +320,106 @@ public class Set extends PApplet {
 			grid.updateSelected(col, row);
 		} else {
 			message = 8;
+		}
+	}
+
+	// I use mousePressed() and mouseReleased() instead of
+	// mouseClicked() to confirm that a clicked button
+	// should include a release as well.
+	// the strat: gather info about
+	// where a mouse was pressed and released; if two locations match, then yay all
+	// good
+
+	// when a non-button is clicked, use -1 to indicate none selected
+	int mousex = -1;
+	int mousey = -1;
+	// clickedRow and clickedCol make sure that
+	// where the mouse was pressed needs to be the same as the cell where the
+	// mouse was released in order for a toggle to happen.
+	int clickedRow = -1;
+	int clickedCol = -1;
+	int buttonSelected = -1;
+	int buttonReleased = -1;
+
+	@Override
+	public void mousePressed() {
+		if (Utility_Functions.between(mouseX, GRID_LEFT_OFFSET, grid.rightOffset())
+				&& Utility_Functions.between(mouseY, GRID_TOP_OFFSET, GRID_BOTTOM)) {
+			int xPos = (mouseX - GRID_LEFT_OFFSET) % (CARD_WIDTH + GRID_X_SPACER);
+			int yPos = (mouseY - GRID_TOP_OFFSET) % (CARD_HEIGHT + GRID_Y_SPACER);
+
+			if ((Utility_Functions.between(xPos, CARD_WIDTH + 1, CARD_WIDTH + GRID_X_SPACER)
+					|| Utility_Functions.between(yPos, CARD_HEIGHT + 1, CARD_HEIGHT + GRID_Y_SPACER))) {
+			} else {
+				clickedCol = (mouseX - GRID_LEFT_OFFSET) / (CARD_WIDTH + GRID_X_SPACER);
+				clickedRow = (mouseY - GRID_TOP_OFFSET) / (CARD_HEIGHT + GRID_Y_SPACER);
+				// grid.updateSelected(clickedCol, clickedRow);
+			}
+		} else {
+			buttonSelected = -1;
+			for (int i = 0; i < NUM_BUTTONS; i++) {
+				if (Utility_Functions.between(mouseX, BUTTON_LEFT_OFFSET + i * (BUTTON_WIDTH + 12),
+						BUTTON_LEFT_OFFSET + i * (BUTTON_WIDTH + 12) + BUTTON_WIDTH)
+						&& Utility_Functions.between(mouseY, BUTTON_TOP_OFFSET, BUTTON_TOP_OFFSET + BUTTON_HEIGHT)) {
+					mousex = mouseX;
+					mousey = mouseY;
+					// 0: Add Cards, 1: Find Set, 2: New Game, 3: Pause Game
+					buttonSelected = i;
+				}
+			}
+		}
+	}
+
+	@Override
+	public void mouseReleased() {
+		// buttonReleased determines if a button was clicked
+		// Must set to -1 here as if not, do not want state change
+		buttonReleased = -1;
+
+		// If the click was on the grid, toggle the appropriate cell
+		if (Utility_Functions.between(mouseX, GRID_LEFT_OFFSET, grid.rightOffset())
+				&& Utility_Functions.between(mouseY, GRID_TOP_OFFSET, GRID_BOTTOM) && !(state == State.GAME_OVER)
+				&& !(state == State.PAUSED)) {
+			int xPos = (mouseX - GRID_LEFT_OFFSET) % (CARD_WIDTH + GRID_X_SPACER);
+			int yPos = (mouseY - GRID_TOP_OFFSET) % (CARD_HEIGHT + GRID_Y_SPACER);
+
+			if ((Utility_Functions.between(xPos, CARD_WIDTH + 1, CARD_WIDTH + GRID_X_SPACER)
+					|| Utility_Functions.between(yPos, CARD_HEIGHT + 1, CARD_HEIGHT + GRID_Y_SPACER))) {
+			} else {
+				int col = (mouseX - GRID_LEFT_OFFSET) / (CARD_WIDTH + GRID_X_SPACER);
+				int row = (mouseY - GRID_TOP_OFFSET) / (CARD_HEIGHT + GRID_Y_SPACER);
+				if (row == clickedRow && col == clickedCol) {
+					grid.updateSelected(clickedCol, clickedRow);
+				}
+			}
+		} else { // Figure out if a button was clicked and, if so, which one
+			for (int i = 0; i < NUM_BUTTONS; i++) {
+				if (Utility_Functions.between(mouseX, BUTTON_LEFT_OFFSET + i * (BUTTON_WIDTH + 12),
+						BUTTON_LEFT_OFFSET + i * (BUTTON_WIDTH + 12) + BUTTON_WIDTH)
+						&& Utility_Functions.between(mouseY, BUTTON_TOP_OFFSET, BUTTON_TOP_OFFSET + BUTTON_HEIGHT)) {
+					buttonReleased = i;
+				}
+			}
+			if (buttonSelected == buttonReleased && buttonReleased >= 0) {
+				if (buttonReleased == 2) {
+					newGame();
+				} else if (state != State.GAME_OVER) {
+					switch (buttonReleased) {
+					case 0:
+						grid.addColumn();
+						break;
+					case 1:
+						state = State.FIND_SET;
+						highlightCounter = 0;
+						break;
+					case 3:
+						Timer_Procedures.togglePauseResume(this);
+						break;
+					default:
+						break;
+					}
+				}
+			}
 		}
 	}
 
